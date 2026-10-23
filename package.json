@@ -1,0 +1,33 @@
+{
+  "name": "nilik",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A local visual anomaly inspection workstation for manufacturing QA.",
+  "license": "MIT",
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": ">=11.0.0 <12"
+  },
+  "scripts": {
+    "build": "pnpm --dir web build",
+    "calibrate": ".venv/bin/python -m nilik.cli.calibrate",
+    "check:files": "node scripts/check-file-lengths.mjs",
+    "dev": "node scripts/dev.mjs",
+    "evaluate": ".venv/bin/python -m nilik.cli.evaluate",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": ".venv/bin/ruff check src tests && pnpm --dir web lint",
+    "quality": "pnpm format:check && pnpm check:files && pnpm lint && pnpm typecheck && pnpm test && pnpm evaluate && pnpm build",
+    "serve": ".venv/bin/python -m nilik.cli.serve",
+    "setup": "bash scripts/setup-local.sh",
+    "test": ".venv/bin/pytest --cov=nilik --cov-report=term-missing && pnpm --dir web test",
+    "test:e2e": "playwright test",
+    "typecheck": "pnpm --dir web typecheck"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "prettier": "3.9.9"
+  }
+}

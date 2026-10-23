@@ -1,0 +1,60 @@
+/** Module responsible for responsive inspection layouts. */
+
+@media (max-width: 900px) {
+  .hero,
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero {
+    padding: 38px;
+  }
+  .hero-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .hero-metrics div {
+    display: grid;
+  }
+}
+@media (max-width: 620px) {
+  main {
+    width: 94vw;
+    margin-top: 14px;
+  }
+  .topbar {
+    padding: 0 4vw;
+  }
+  .service-status {
+    font-size: 0;
+  }
+  .hero {
+    min-height: auto;
+    padding: 30px 24px;
+    border-radius: 20px;
+  }
+  .hero h1 {
+    font-size: 39px;
+  }
+  .hero-metrics {
+    grid-template-columns: 1fr;
+  }
+  .status-strip small {
+    display: none;
+  }
+  .sample-stage {
+    grid-template-columns: 1fr;
+  }
+  .sample-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sample-panel,
+  .result-panel,
+  .history-panel {
+    padding: 20px;
+  }
+  .score-row {
+    grid-template-columns: 1fr;
+  }
+  footer {
+    display: grid;
+  }
+}
