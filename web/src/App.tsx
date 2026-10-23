@@ -13,9 +13,7 @@ export function App() {
   const [selected, setSelected] = useState<DemoSample>();
   const [result, setResult] = useState<InspectionResult>();
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [status, setStatus] = useState(
-    "Connecting to the local inspection service…",
-  );
+  const [status, setStatus] = useState("Connecting to inspection service");
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -25,7 +23,7 @@ export function App() {
         setSamples(available);
         setSelected(available[0]);
         setHistory(records);
-        setStatus("Ready for inspection");
+        setStatus("Station ready");
       })
       .catch((error: Error) => setStatus(error.message));
   }, []);
@@ -33,12 +31,12 @@ export function App() {
   async function runInspection() {
     if (!selected) return;
     setBusy(true);
-    setStatus(`Inspecting ${selected.name}…`);
+    setStatus(`Scanning ${selected.name}`);
     try {
       const nextResult = await inspectSample(selected);
       setResult(nextResult);
       setHistory(await fetchHistory());
-      setStatus(`${selected.name} recorded as ${nextResult.decision}`);
+      setStatus(`${selected.name} · ${nextResult.decision}`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Inspection failed");
     } finally {
@@ -53,7 +51,7 @@ export function App() {
       const sample = await fileToSample(file);
       setSelected(sample);
       setResult(undefined);
-      setStatus("Uploaded image normalized to the 64 × 64 inspection profile");
+      setStatus("Image normalized to active inspection profile");
     } catch (error) {
       setStatus(
         error instanceof Error ? error.message : "Image could not be read",
@@ -63,71 +61,141 @@ export function App() {
     }
   }
 
+  function choose(sample: DemoSample) {
+    setSelected(sample);
+    setResult(undefined);
+    setStatus(`${sample.name} loaded`);
+  }
+
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <a className="brand" href="#top" aria-label="Nilik home">
+    <div className="station-shell">
+      <aside className="rail">
+        <a href="#station" className="rail-logo" aria-label="Nilik home">
           <img src="/nilik-mark.png" alt="" />
-          <span>
-            <strong>Nilik</strong>
-            <small>Visual quality station</small>
-          </span>
         </a>
-        <div className="service-status">
-          <i /> Local workstation · v1.0
-        </div>
-      </header>
+        <nav aria-label="Station sections">
+          <a className="rail-link rail-link--active" href="#station">
+            <span>01</span>Inspect
+          </a>
+          <a className="rail-link" href="#records">
+            <span>02</span>Records
+          </a>
+        </nav>
+        <span className="rail-version">V1.0</span>
+      </aside>
 
-      <main id="top">
-        <section className="hero">
-          <div>
-            <span className="eyebrow eyebrow--light">
-              Computer vision for the factory floor
-            </span>
-            <h1>
-              See the anomaly.
-              <br />
-              Keep the decision human.
-            </h1>
+      <div className="station-body">
+        <header className="station-header">
+          <div className="wordmark">
+            <strong>NILIK</strong>
+            <span>VISUAL QUALITY SYSTEM</span>
+          </div>
+          <div className="station-state">
+            <i />
+            {status}
+          </div>
+          <div className="station-meta">
+            <span>STATION</span>
+            <strong>QA-01</strong>
+          </div>
+        </header>
+
+        <main id="station">
+          <section className="title-row">
+            <div>
+              <span className="overline">SURFACE CONTROL / LOCAL CELL</span>
+              <h1>
+                Inspection
+                <br />
+                workstation
+              </h1>
+            </div>
             <p>
-              Nilik turns a surface image into an explainable quality decision,
-              highlights the evidence, and keeps every operator review
-              traceable.
+              Calibrated anomaly triage with evidence that stays visible to the
+              operator. The system recommends; the quality team decides.
             </p>
-          </div>
-          <div className="hero-metrics">
-            <div>
-              <strong>64 × 64</strong>
-              <span>reproducible profile</span>
-            </div>
-            <div>
-              <strong>3</strong>
-              <span>synthetic defect families</span>
-            </div>
-            <div>
-              <strong>Local</strong>
-              <span>images stay on device</span>
-            </div>
-          </div>
-        </section>
-
-        <div className="status-strip" role="status">
-          <span>{status}</span>
-          <small>Surface profile · calibrated reference set</small>
-        </div>
-
-        <section className="workspace-grid">
-          <article className="panel sample-panel">
-            <div className="panel-heading">
+            <dl>
               <div>
-                <span className="eyebrow">01 · Select</span>
-                <h2>Inspection sample</h2>
+                <dt>PROFILE</dt>
+                <dd>64 × 64 / GRAYSCALE</dd>
+              </div>
+              <div>
+                <dt>DATA MODE</dt>
+                <dd>LOCAL / SYNTHETIC DEMO</dd>
+              </div>
+              <div>
+                <dt>ENGINE</dt>
+                <dd>SURFACE-V1</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section className="inspection-deck">
+            <div className="viewport-column">
+              <div className="viewport-toolbar">
+                <span>
+                  <i /> INPUT FRAME
+                </span>
+                <span>{selected?.name ?? "AWAITING SAMPLE"}</span>
+                <span>64 × 64 PX</span>
+              </div>
+              <div className="viewfinder">
+                {selected ? (
+                  <SurfaceCanvas
+                    pixels={selected.pixels}
+                    heatmap={result?.heatmap}
+                    regions={result?.regions}
+                  />
+                ) : (
+                  <div className="canvas-skeleton" />
+                )}
+                <span className="corner corner--tl" />
+                <span className="corner corner--tr" />
+                <span className="corner corner--bl" />
+                <span className="corner corner--br" />
+                <div className="scan-line" />
+              </div>
+              <div className="viewport-caption">
+                <span>{result ? "ANALYSIS COMPLETE" : "RAW INPUT"}</span>
+                <p>
+                  {result?.explanation ??
+                    "Select a sample and start inspection."}
+                </p>
+              </div>
+            </div>
+
+            <aside className="control-column">
+              <div className="control-heading">
+                <span>ACTIVE LOT</span>
+                <strong>{selected?.label ?? "Loading"}</strong>
+                <small>{selected?.name ?? "Connecting to API"}</small>
+              </div>
+              <div className="sample-stack" aria-label="Demo samples">
+                {samples.map((sample, index) => (
+                  <button
+                    className={
+                      selected?.name === sample.name
+                        ? "sample-row sample-row--active"
+                        : "sample-row"
+                    }
+                    key={sample.name}
+                    onClick={() => choose(sample)}
+                  >
+                    <span className="sample-index">0{index + 1}</span>
+                    <SurfaceCanvas pixels={sample.pixels} />
+                    <span className="sample-label">
+                      <strong>{sample.label}</strong>
+                      <small>{sample.expected}</small>
+                    </span>
+                    <span className="sample-arrow">↗</span>
+                  </button>
+                ))}
               </div>
               <button
-                className="button button--ghost"
+                className="upload-link"
                 onClick={() => inputRef.current?.click()}
               >
-                Upload image
+                + LOAD EXTERNAL IMAGE
               </button>
               <input
                 ref={inputRef}
@@ -136,109 +204,58 @@ export function App() {
                 accept="image/*"
                 onChange={upload}
               />
-            </div>
-            <div className="sample-stage">
-              {selected ? (
-                <SurfaceCanvas pixels={selected.pixels} />
+              <button
+                className="inspect-button"
+                disabled={!selected || busy}
+                onClick={() => void runInspection()}
+              >
+                <span>{busy ? "ANALYZING FRAME" : "RUN INSPECTION"}</span>
+                <b>→</b>
+              </button>
+            </aside>
+          </section>
+
+          <section
+            className={result ? "verdict verdict--ready" : "verdict"}
+            aria-live="polite"
+          >
+            <div className="verdict-label">
+              <span>DECISION OUTPUT</span>
+              {result ? (
+                <DecisionBadge decision={result.decision} />
               ) : (
-                <div className="canvas-skeleton" />
+                <strong>—</strong>
               )}
-              <div className="sample-copy">
-                <span className="sample-id">
-                  {selected?.name ?? "Loading samples"}
-                </span>
-                <strong>{selected?.label ?? "Waiting for API"}</strong>
-                <p>
-                  Images are normalized in the browser before local analysis.
-                </p>
-              </div>
             </div>
-            <div className="sample-list" aria-label="Demo samples">
-              {samples.map((sample) => (
-                <button
-                  className={
-                    selected?.name === sample.name
-                      ? "sample-chip sample-chip--active"
-                      : "sample-chip"
-                  }
-                  key={sample.name}
-                  onClick={() => {
-                    setSelected(sample);
-                    setResult(undefined);
-                    setStatus(`${sample.name} selected`);
-                  }}
-                >
-                  <SurfaceCanvas pixels={sample.pixels} />
-                  <span>
-                    {sample.label}
-                    <small>{sample.expected}</small>
-                  </span>
-                </button>
-              ))}
+            <div>
+              <span>ANOMALY SCORE</span>
+              <strong>
+                {result ? `${result.anomaly_score.toFixed(2)}×` : "0.00×"}
+              </strong>
             </div>
-            <button
-              className="button button--primary"
-              disabled={!selected || busy}
-              onClick={() => void runInspection()}
-            >
-              {busy ? "Inspecting…" : "Run visual inspection"}
-            </button>
-          </article>
+            <div>
+              <span>REVIEW BOUNDARY</span>
+              <strong>
+                {result ? `${result.threshold.toFixed(2)}×` : "1.00×"}
+              </strong>
+            </div>
+            <div>
+              <span>CONNECTED REGIONS</span>
+              <strong>{result?.regions.length ?? 0}</strong>
+            </div>
+          </section>
 
-          <article className="panel result-panel">
-            <div className="panel-heading">
-              <div>
-                <span className="eyebrow">02 · Decide</span>
-                <h2>Evidence view</h2>
-              </div>
-              {result && <DecisionBadge decision={result.decision} />}
-            </div>
-            {result && selected ? (
-              <>
-                <div className="result-stage">
-                  <SurfaceCanvas
-                    pixels={selected.pixels}
-                    heatmap={result.heatmap}
-                    regions={result.regions}
-                  />
-                </div>
-                <div className="score-row">
-                  <div>
-                    <span>Anomaly score</span>
-                    <strong>{result.anomaly_score.toFixed(2)}×</strong>
-                  </div>
-                  <div>
-                    <span>Review boundary</span>
-                    <strong>{result.threshold.toFixed(2)}×</strong>
-                  </div>
-                  <div>
-                    <span>Regions</span>
-                    <strong>{result.regions.length}</strong>
-                  </div>
-                </div>
-                <div className="explanation">
-                  <span>Operator context</span>
-                  <p>{result.explanation}</p>
-                </div>
-              </>
-            ) : (
-              <div className="result-empty">
-                <img src="/nilik-mark.png" alt="" />
-                <strong>Evidence appears here</strong>
-                <p>
-                  Choose a reference or anomaly sample, then run the inspection.
-                </p>
-              </div>
-            )}
-          </article>
-        </section>
-
-        <HistoryTable items={history} />
-      </main>
-      <footer>
-        <span>Nilik · reproducible visual inspection</span>
-        <span>Local portfolio release · no production accuracy claim</span>
-      </footer>
+          <div id="records">
+            <HistoryTable items={history} />
+          </div>
+        </main>
+        <footer>
+          <span>NILIK / VISUAL INSPECTION LAB</span>
+          <span>
+            LOCAL RELEASE · SYNTHETIC BENCHMARK · HUMAN REVIEW REQUIRED
+          </span>
+        </footer>
+      </div>
     </div>
   );
 }

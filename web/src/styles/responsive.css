@@ -1,60 +1,150 @@
 /** Module responsible for responsive inspection layouts. */
 
-@media (max-width: 900px) {
-  .hero,
-  .workspace-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 1050px) {
+  .title-row {
+    grid-template-columns: 1fr 1fr;
   }
-  .hero {
-    padding: 38px;
-  }
-  .hero-metrics {
+  .title-row dl {
+    grid-column: 1 / -1;
     grid-template-columns: repeat(3, 1fr);
   }
-  .hero-metrics div {
-    display: grid;
+  .inspection-deck {
+    grid-template-columns: 1fr;
+  }
+  .viewport-column {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .control-column {
+    min-height: 530px;
+  }
+  .sample-stack {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 14px;
   }
 }
-@media (max-width: 620px) {
-  main {
-    width: 94vw;
-    margin-top: 14px;
+
+@media (max-width: 720px) {
+  .station-shell {
+    grid-template-columns: 1fr;
   }
-  .topbar {
-    padding: 0 4vw;
+  .rail {
+    position: static;
+    width: 100%;
+    height: 64px;
+    flex-direction: row;
+    border-right: 0;
+    border-bottom: 1px solid #1c2b3c;
   }
-  .service-status {
+  .rail-logo {
+    width: 64px;
+    height: 64px;
+    border-bottom: 0;
+    border-right: 1px solid #1c2b3c;
+  }
+  .rail-logo img {
+    width: 34px;
+    height: 34px;
+  }
+  .rail nav {
+    width: auto;
+    display: flex;
+    margin: 0;
+  }
+  .rail-link {
+    min-width: 74px;
+    min-height: 64px;
+  }
+  .rail-version {
+    margin: 0 18px 0 auto;
+    writing-mode: initial;
+  }
+  .station-header {
+    height: 74px;
+    grid-template-columns: 1fr auto;
+    padding: 0 5vw;
+  }
+  .station-state {
     font-size: 0;
   }
-  .hero {
-    min-height: auto;
-    padding: 30px 24px;
-    border-radius: 20px;
-  }
-  .hero h1 {
-    font-size: 39px;
-  }
-  .hero-metrics {
-    grid-template-columns: 1fr;
-  }
-  .status-strip small {
+  .station-meta {
     display: none;
   }
-  .sample-stage {
+  main {
+    width: 90%;
+    padding-top: 44px;
+  }
+  .title-row {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-bottom: 40px;
+  }
+  .title-row h1 {
+    font-size: 52px;
+  }
+  .title-row dl {
+    grid-column: auto;
     grid-template-columns: 1fr;
   }
-  .sample-list {
-    grid-template-columns: repeat(2, 1fr);
+  .viewfinder {
+    min-height: 420px;
   }
-  .sample-panel,
-  .result-panel,
-  .history-panel {
-    padding: 20px;
+  .viewfinder .surface-canvas {
+    width: 82%;
   }
-  .score-row {
+  .viewport-toolbar {
+    grid-template-columns: 1fr auto;
+  }
+  .viewport-toolbar span:nth-child(2) {
+    display: none;
+  }
+  .sample-stack {
     grid-template-columns: 1fr;
+  }
+  .verdict {
+    grid-template-columns: 1fr 1fr;
+  }
+  .verdict > div:nth-child(2) {
+    border-right: 0;
+  }
+  .verdict > div {
+    border-bottom: 1px solid var(--line);
   }
   footer {
     display: grid;
+  }
+}
+
+@media (max-width: 440px) {
+  .wordmark span {
+    display: none;
+  }
+  main {
+    width: 94%;
+  }
+  .title-row h1 {
+    font-size: 44px;
+  }
+  .viewport-column {
+    padding: 10px;
+  }
+  .viewfinder {
+    min-height: 350px;
+  }
+  .corner {
+    width: 28px;
+    height: 28px;
+  }
+  .control-column {
+    padding: 24px 18px;
+  }
+  .verdict {
+    grid-template-columns: 1fr;
+  }
+  .verdict > div {
+    border-right: 0;
+  }
+  .history-panel {
+    padding: 20px 16px;
   }
 }
